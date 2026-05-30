@@ -61,8 +61,6 @@ reg [4:0]  mem_wb_rd;
 reg [31:0] mem_wb_alu_result;
 reg [31:0] mem_wb_load_data;
 
-// Explicit flip-flop register file.
-// x0 is hardwired to zero by read_reg(), and x1~x31 are ordinary registers.
 reg [31:0] rf_x1,  rf_x2,  rf_x3,  rf_x4;
 reg [31:0] rf_x5,  rf_x6,  rf_x7,  rf_x8;
 reg [31:0] rf_x9,  rf_x10, rf_x11, rf_x12;
@@ -96,8 +94,8 @@ wire id_uses_rs1 = id_is_load || id_is_store || id_is_addi || id_is_addsub || id
 wire id_uses_rs2 = id_is_store || id_is_addsub || id_is_branch;
 
 wire [31:0] wb_wdata = mem_wb_mem_to_reg ? mem_wb_load_data : mem_wb_alu_result;
-wire [31:0] id_rs1_raw = read_reg(id_rs1);
-wire [31:0] id_rs2_raw = read_reg(id_rs2);
+reg [31:0] id_rs1_raw;
+reg [31:0] id_rs2_raw;
 wire [31:0] id_rs1_value = (mem_wb_valid && mem_wb_reg_write &&
                             (mem_wb_rd != 5'd0) && (mem_wb_rd == id_rs1)) ?
                            wb_wdata : id_rs1_raw;
@@ -161,45 +159,90 @@ wire [31:0] mem_rs2_fwd = (mem_wb_valid && mem_wb_reg_write &&
                           wb_wdata : id_ex_rs2_val;
 wire [31:0] mem_addr_result = mem_rs1_fwd + id_ex_imm;
 
-function [31:0] read_reg;
-    input [4:0] addr;
-    begin
-        case (addr)
-            5'd1:  read_reg = rf_x1;
-            5'd2:  read_reg = rf_x2;
-            5'd3:  read_reg = rf_x3;
-            5'd4:  read_reg = rf_x4;
-            5'd5:  read_reg = rf_x5;
-            5'd6:  read_reg = rf_x6;
-            5'd7:  read_reg = rf_x7;
-            5'd8:  read_reg = rf_x8;
-            5'd9:  read_reg = rf_x9;
-            5'd10: read_reg = rf_x10;
-            5'd11: read_reg = rf_x11;
-            5'd12: read_reg = rf_x12;
-            5'd13: read_reg = rf_x13;
-            5'd14: read_reg = rf_x14;
-            5'd15: read_reg = rf_x15;
-            5'd16: read_reg = rf_x16;
-            5'd17: read_reg = rf_x17;
-            5'd18: read_reg = rf_x18;
-            5'd19: read_reg = rf_x19;
-            5'd20: read_reg = rf_x20;
-            5'd21: read_reg = rf_x21;
-            5'd22: read_reg = rf_x22;
-            5'd23: read_reg = rf_x23;
-            5'd24: read_reg = rf_x24;
-            5'd25: read_reg = rf_x25;
-            5'd26: read_reg = rf_x26;
-            5'd27: read_reg = rf_x27;
-            5'd28: read_reg = rf_x28;
-            5'd29: read_reg = rf_x29;
-            5'd30: read_reg = rf_x30;
-            5'd31: read_reg = rf_x31;
-            default: read_reg = 32'd0;
-        endcase
-    end
-endfunction
+initial begin
+    rf_x1  = 32'd0; rf_x2  = 32'd0; rf_x3  = 32'd0; rf_x4  = 32'd0;
+    rf_x5  = 32'd0; rf_x6  = 32'd0; rf_x7  = 32'd0; rf_x8  = 32'd0;
+    rf_x9  = 32'd0; rf_x10 = 32'd0; rf_x11 = 32'd0; rf_x12 = 32'd0;
+    rf_x13 = 32'd0; rf_x14 = 32'd0; rf_x15 = 32'd0; rf_x16 = 32'd0;
+    rf_x17 = 32'd0; rf_x18 = 32'd0; rf_x19 = 32'd0; rf_x20 = 32'd0;
+    rf_x21 = 32'd0; rf_x22 = 32'd0; rf_x23 = 32'd0; rf_x24 = 32'd0;
+    rf_x25 = 32'd0; rf_x26 = 32'd0; rf_x27 = 32'd0; rf_x28 = 32'd0;
+    rf_x29 = 32'd0; rf_x30 = 32'd0; rf_x31 = 32'd0;
+end
+
+always @(*) begin
+    case (id_rs1)
+        5'd1:  id_rs1_raw = rf_x1;
+        5'd2:  id_rs1_raw = rf_x2;
+        5'd3:  id_rs1_raw = rf_x3;
+        5'd4:  id_rs1_raw = rf_x4;
+        5'd5:  id_rs1_raw = rf_x5;
+        5'd6:  id_rs1_raw = rf_x6;
+        5'd7:  id_rs1_raw = rf_x7;
+        5'd8:  id_rs1_raw = rf_x8;
+        5'd9:  id_rs1_raw = rf_x9;
+        5'd10: id_rs1_raw = rf_x10;
+        5'd11: id_rs1_raw = rf_x11;
+        5'd12: id_rs1_raw = rf_x12;
+        5'd13: id_rs1_raw = rf_x13;
+        5'd14: id_rs1_raw = rf_x14;
+        5'd15: id_rs1_raw = rf_x15;
+        5'd16: id_rs1_raw = rf_x16;
+        5'd17: id_rs1_raw = rf_x17;
+        5'd18: id_rs1_raw = rf_x18;
+        5'd19: id_rs1_raw = rf_x19;
+        5'd20: id_rs1_raw = rf_x20;
+        5'd21: id_rs1_raw = rf_x21;
+        5'd22: id_rs1_raw = rf_x22;
+        5'd23: id_rs1_raw = rf_x23;
+        5'd24: id_rs1_raw = rf_x24;
+        5'd25: id_rs1_raw = rf_x25;
+        5'd26: id_rs1_raw = rf_x26;
+        5'd27: id_rs1_raw = rf_x27;
+        5'd28: id_rs1_raw = rf_x28;
+        5'd29: id_rs1_raw = rf_x29;
+        5'd30: id_rs1_raw = rf_x30;
+        5'd31: id_rs1_raw = rf_x31;
+        default: id_rs1_raw = 32'd0;
+    endcase
+end
+
+always @(*) begin
+    case (id_rs2)
+        5'd1:  id_rs2_raw = rf_x1;
+        5'd2:  id_rs2_raw = rf_x2;
+        5'd3:  id_rs2_raw = rf_x3;
+        5'd4:  id_rs2_raw = rf_x4;
+        5'd5:  id_rs2_raw = rf_x5;
+        5'd6:  id_rs2_raw = rf_x6;
+        5'd7:  id_rs2_raw = rf_x7;
+        5'd8:  id_rs2_raw = rf_x8;
+        5'd9:  id_rs2_raw = rf_x9;
+        5'd10: id_rs2_raw = rf_x10;
+        5'd11: id_rs2_raw = rf_x11;
+        5'd12: id_rs2_raw = rf_x12;
+        5'd13: id_rs2_raw = rf_x13;
+        5'd14: id_rs2_raw = rf_x14;
+        5'd15: id_rs2_raw = rf_x15;
+        5'd16: id_rs2_raw = rf_x16;
+        5'd17: id_rs2_raw = rf_x17;
+        5'd18: id_rs2_raw = rf_x18;
+        5'd19: id_rs2_raw = rf_x19;
+        5'd20: id_rs2_raw = rf_x20;
+        5'd21: id_rs2_raw = rf_x21;
+        5'd22: id_rs2_raw = rf_x22;
+        5'd23: id_rs2_raw = rf_x23;
+        5'd24: id_rs2_raw = rf_x24;
+        5'd25: id_rs2_raw = rf_x25;
+        5'd26: id_rs2_raw = rf_x26;
+        5'd27: id_rs2_raw = rf_x27;
+        5'd28: id_rs2_raw = rf_x28;
+        5'd29: id_rs2_raw = rf_x29;
+        5'd30: id_rs2_raw = rf_x30;
+        5'd31: id_rs2_raw = rf_x31;
+        default: id_rs2_raw = 32'd0;
+    endcase
+end
 
 Instruction_Memory u_instr_mem(
     .clka(CLK),
@@ -223,18 +266,8 @@ always @(*) begin
     end
 end
 
-always @(posedge CLK or negedge RSTN) begin
-    if (!RSTN) begin
-        rf_x1  <= 32'd0; rf_x2  <= 32'd0; rf_x3  <= 32'd0; rf_x4  <= 32'd0;
-        rf_x5  <= 32'd0; rf_x6  <= 32'd0; rf_x7  <= 32'd0; rf_x8  <= 32'd0;
-        rf_x9  <= 32'd0; rf_x10 <= 32'd0; rf_x11 <= 32'd0; rf_x12 <= 32'd0;
-        rf_x13 <= 32'd0; rf_x14 <= 32'd0; rf_x15 <= 32'd0; rf_x16 <= 32'd0;
-        rf_x17 <= 32'd0; rf_x18 <= 32'd0; rf_x19 <= 32'd0; rf_x20 <= 32'd0;
-        rf_x21 <= 32'd0; rf_x22 <= 32'd0; rf_x23 <= 32'd0; rf_x24 <= 32'd0;
-        rf_x25 <= 32'd0; rf_x26 <= 32'd0; rf_x27 <= 32'd0; rf_x28 <= 32'd0;
-        rf_x29 <= 32'd0; rf_x30 <= 32'd0; rf_x31 <= 32'd0;
-    end
-    else if (mem_wb_valid && mem_wb_reg_write) begin
+always @(posedge CLK) begin
+    if (mem_wb_valid && mem_wb_reg_write) begin
         case (mem_wb_rd)
             5'd1:  rf_x1  <= wb_wdata;
             5'd2:  rf_x2  <= wb_wdata;
